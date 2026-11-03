@@ -1,6 +1,6 @@
-import { navItems } from './src/content.js';
-import { renderNav, renderHome, renderEmpty, renderDetail, renderLetters } from './src/views.js';
-import { createPlayer } from './src/player.js';
+import { navItems } from './src/content.js?v=30';
+import { renderNav, renderHome, renderEmpty, renderDetail, renderLetters } from './src/views.js?v=30';
+import { createPlayer } from './src/player.js?v=30';
 
 const app = document.querySelector('#app');
 const loading = document.querySelector('#loading');
@@ -60,6 +60,9 @@ function setupLetter() {
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let currentPage = pageFromHash();
 let routeAnimationVersion = 0;
+let activeViewTransition;
+let activeRouteOverlay;
+let routeOverlayTimer = 0;
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
 function navigateTo(page) {
@@ -73,8 +76,50 @@ function navigateTo(page) {
 function onRouteChange() {
   const nextPage = pageFromHash();
   const version = ++routeAnimationVersion;
+  const direction = nextPage === 'letter' ? 'forward' : currentPage === 'letter' && nextPage === 'home' ? 'back' : 'tab';
   app.classList.remove('route-entering-from-right', 'route-entering-from-left', 'route-entering-from-tab');
-  if (!reducedMotion.matches) app.classList.add(nextPage === 'letter' ? 'route-entering-from-right' : currentPage === 'letter' && nextPage === 'home' ? 'route-entering-from-left' : 'route-entering-from-tab');
+  clearTimeout(routeOverlayTimer);
+  activeRouteOverlay?.remove();
+  activeRouteOverlay = undefined;
+  routeContent.classList.remove('route-slide-in-forward', 'route-slide-in-back');
+  if (!reducedMotion.matches && direction !== 'tab' && document.startViewTransition) {
+    activeViewTransition?.skipTransition();
+    document.documentElement.dataset.routeDirection = direction;
+    const transition = document.startViewTransition(() => {
+      render();
+      currentPage = nextPage;
+    });
+    activeViewTransition = transition;
+    transition.finished.finally(() => {
+      if (version === routeAnimationVersion) {
+        delete document.documentElement.dataset.routeDirection;
+        activeViewTransition = undefined;
+      }
+    });
+    return;
+  }
+  if (!reducedMotion.matches && direction !== 'tab') {
+    const overlay = document.createElement('div');
+    overlay.className = `route-snapshot route-slide-out-${direction}`;
+    overlay.setAttribute('aria-hidden', 'true');
+    overlay.innerHTML = routeContent.innerHTML;
+    const oldScreen = overlay.querySelector('.screen');
+    if (oldScreen) oldScreen.style.marginTop = `-${window.scrollY}px`;
+    app.append(overlay);
+    activeRouteOverlay = overlay;
+    render();
+    currentPage = nextPage;
+    routeContent.classList.add(`route-slide-in-${direction}`);
+    routeOverlayTimer = window.setTimeout(() => {
+      if (version === routeAnimationVersion) {
+        overlay.remove();
+        activeRouteOverlay = undefined;
+        routeContent.classList.remove('route-slide-in-forward', 'route-slide-in-back');
+      }
+    }, 360);
+    return;
+  }
+  if (!reducedMotion.matches) app.classList.add(direction === 'forward' ? 'route-entering-from-right' : direction === 'back' ? 'route-entering-from-left' : 'route-entering-from-tab');
   render();
   currentPage = nextPage;
   if (!reducedMotion.matches) requestAnimationFrame(() => requestAnimationFrame(() => {

@@ -1,5 +1,5 @@
-import { asset, tracks } from './content.js';
-import { renderMiniPlayer } from './views.js';
+import { asset, tracks } from './content.js?v=30';
+import { renderMiniPlayer } from './views.js?v=30';
 
 export function createPlayer(app, navigateTo) {
   const audio = new Audio(asset('demo-light-piano.m4a'));

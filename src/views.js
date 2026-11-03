@@ -1,4 +1,4 @@
-import { asset, letterText, navItems, recommendations, letterThemes } from './content.js';
+import { asset, letterText, navItems, recommendations, letterThemes } from './content.js?v=30';
 
 export function renderNav() {
   return `<nav class="bottom-nav" aria-label="底部导航">
@@ -112,7 +112,7 @@ export function renderDetail(hasPlayed) {
 
 export function renderLetters(hasPlayed) {
   return `<main class="screen collection-screen ${hasPlayed ? 'has-mini' : ''}" data-page="letters">
-    <div class="collection-hero" aria-hidden="true"><img src="${asset('detail-art.png')}" alt="" /></div>
+    <div class="collection-hero" aria-hidden="true"><img src="${asset('letters-hero.jpg')}" alt="" /></div>
     <div class="collection-content">
       <span class="collection-eyebrow">LETTERS / COLLECTION</span>
       <h1>写给你的信</h1>

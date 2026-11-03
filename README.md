@@ -24,6 +24,8 @@ python3 -m http.server 4173
 
 临时演示：详情页的「书信专区」入口可进入独立的书信主题集合页；专区和「更多推荐」卡片可点播，复用同一条演示音频并更新迷你播放器标题与封面。此演示功能不写入 PRD，后续内容与真实音频仍待确定。
 
+`assets/letters-hero.jpg` 是为书信专区新生成的演示插画，沿用落霞来信的纸张与落日色系，不含第三方图片素材。
+
 ## 演示音乐来源与授权
 
 `assets/demo-light-piano.m4a` 使用 [《In This Moment》](https://www.scottbuckley.com.au/library/in-this-moment/)：**‘In This Moment’ by Scott Buckley – released under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). [www.scottbuckley.com.au](https://www.scottbuckley.com.au/)**。
